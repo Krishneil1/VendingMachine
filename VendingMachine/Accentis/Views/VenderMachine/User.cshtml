@@ -1,0 +1,94 @@
+﻿
+@{
+    ViewBag.Title = "User";
+}
+
+<h2>User</h2>
+
+<div class="jumbotron">
+
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="col-md-2">
+            Product
+        </div>
+        <div class="col-md-4">
+            @Html.ListBox("Product") 
+        </div>
+        <div class="col-md-3" >
+            <input type="number" id="Quantity" name="Quantity" Value="1" Disabled/>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="col-md-3">
+            <button href="javascript:void(0)"  type="button" id="AddtoCart" class="btn btn-success">Add to Cart</button>
+        </div>
+    </div>
+</div>
+<br />
+<div class="row">
+    <div class="col-md-12">
+        <div class="col-md-3">
+            Product Name
+        </div>
+        <div class="col-md-3">
+            <lable id="ProductNamelbl"></lable>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="col-md-3">
+            Quantity
+        </div>
+        <div class="col-md-3">
+            <lable id="Quantitylbl"></lable>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="col-md-3">
+            Total Price
+        </div>
+        <div class="col-md-3">
+            <lable id="Totallbl"></lable>
+        </div>
+    </div>
+    <div class="Col-md-12">
+        <center >
+            <lable class="btn btn-primary" id="purchase">Purchase</lable>
+        </center>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#purchase").attr('disabled', 'disabled');
+        $("#AddtoCart").click(function () {
+            $.ajax({
+                url: "@Url.Action("GetProductPrice", "VenderMachine")",
+                type: "GET",
+                data: { id: $("#Product option:selected").val()},
+                success: function (data) {
+                    $("#ProductNamelbl").text(data.Data.ProductName);
+                    $("#Quantitylbl").text($("#Quantity").val());
+                    $("#Totallbl").text(parseFloat(data.Data.PerItemPrice) * parseInt($("#Quantity").val()));
+                }, error: function (data) {
+
+                }
+            });
+            $("#purchase").removeAttr("disabled");
+        });
+        
+        $("#purchase").click(function () {
+             $.ajax({
+                url: "@Url.Action("ProductPurchase", "VenderMachine")",
+                type: "GET",
+                data: { id: $("#Product option:selected").val(), quantity: $("#Quantity").val(), total: parseFloat($("#Totallbl").text()) },
+                success: function (data) {
+                    location.reload();
+                }, error: function (data) {
+
+                }
+            });
+        });
+    });
+</script>
